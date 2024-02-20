@@ -84,10 +84,11 @@ export default function NpcList({ npcs }: NpcsPageProps) {
     },
   });
 
-  const { startUpload, permittedFileInfo } = useUploadThing(
-    "imageUploader",
-    {},
-  );
+  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onClientUploadComplete() {
+      setFiles([]);
+    },
+  });
 
   const fileTypes = permittedFileInfo?.config
     ? Object.keys(permittedFileInfo?.config)
@@ -182,12 +183,7 @@ export default function NpcList({ npcs }: NpcsPageProps) {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-              const result = npcInput.safeParse(npc);
 
-              if (!result.success) {
-                console.log("nao foi");
-                return;
-              }
               setLoading(true);
               const res = await startUpload(files);
               const body = {
@@ -242,7 +238,10 @@ export default function NpcList({ npcs }: NpcsPageProps) {
                     />
                   </div>
 
-                  <div {...getRootProps()}>
+                  <div
+                    {...getRootProps()}
+                    className="flex cursor-pointer justify-center border p-1"
+                  >
                     <input {...getInputProps()} />
                     <div>
                       {files.length > 0 && <p>Upload {files.length} files</p>}
@@ -277,12 +276,7 @@ export default function NpcList({ npcs }: NpcsPageProps) {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const result = npcInput.safeParse(selectNpc);
 
-              if (!result.success) {
-                console.log("nao foi");
-                return;
-              }
               editNpc.mutate(selectNpc);
               setEditModalForm(false);
             }}
